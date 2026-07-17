@@ -1,0 +1,230 @@
+name: Rebuild Max patch presentation UI
+
+on:
+  push:
+    branches:
+      - agent-assisted
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild-ui:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent-assisted
+
+      - name: Build a clean presentation view
+        shell: bash
+        run: |
+          python3 <<'PY'
+          import json
+          from pathlib import Path
+
+          patch_path = Path("Netzwerk Patch.maxpat")
+          data = json.loads(patch_path.read_text(encoding="utf-8"))
+          patcher = data["patcher"]
+          original_lines = json.dumps(patcher.get("lines", []), sort_keys=True)
+
+          patcher["openinpresentation"] = 1
+          patcher["description"] = "Local Ethernet audio and message exchange module for networked laptop performance."
+          patcher["digest"] = "Four-node Max/MSP network module for NetSound Collective LaptopEnsemble."
+          patcher["tags"] = "maxmsp network ethernet audio messages laptop ensemble"
+
+          boxes = [entry for entry in patcher.get("boxes", []) if not entry.get("box", {}).get("id", "").startswith("agent-ui-")]
+          by_id = {entry["box"]["id"]: entry["box"] for entry in boxes}
+
+          for box in by_id.values():
+              box.pop("presentation", None)
+              box.pop("presentation_rect", None)
+
+          def show(object_id, rect):
+              box = by_id[object_id]
+              box["presentation"] = 1
+              box["presentation_rect"] = [float(value) for value in rect]
+
+          def comment(object_id, text, rect, size=12.0, bold=False, color=None, align=0):
+              box = {
+                  "id": object_id,
+                  "maxclass": "comment",
+                  "numinlets": 1,
+                  "numoutlets": 0,
+                  "patching_rect": [20.0, 20.0, float(rect[2]), float(rect[3])],
+                  "presentation": 1,
+                  "presentation_rect": [float(value) for value in rect],
+                  "text": text,
+                  "fontname": "Arial",
+                  "fontsize": float(size),
+                  "textjustification": align,
+              }
+              if bold:
+                  box["fontface"] = 1
+              if color is not None:
+                  box["textcolor"] = color
+              return {"box": box}
+
+          def panel(object_id, rect):
+              return {"box": {
+                  "id": object_id,
+                  "maxclass": "panel",
+                  "numinlets": 1,
+                  "numoutlets": 0,
+                  "mode": 0,
+                  "border": 1,
+                  "rounded": 12,
+                  "bgcolor": [0.965, 0.965, 0.965, 1.0],
+                  "bordercolor": [0.78, 0.78, 0.78, 1.0],
+                  "patching_rect": [20.0, 20.0, float(rect[2]), float(rect[3])],
+                  "presentation": 1,
+                  "presentation_rect": [float(value) for value in rect],
+              }}
+
+          participants = [
+              {
+                  "name": "Sascha", "x": 35,
+                  "send": {"open": "obj-112", "play": "obj-106", "loop": "obj-105", "stream": "obj-100", "meter": "obj-104", "ip": "obj-94", "port": "obj-93", "connected": "obj-91", "latency": "obj-11", "latency_set": "obj-117"},
+                  "receive": {"ip": "obj-88", "port": "obj-82", "connected": "obj-63", "meter_l": "obj-79", "meter_r": "obj-76", "output": "obj-334", "gain": "obj-341"},
+              },
+              {
+                  "name": "Dmitrii", "x": 320,
+                  "send": {"open": "obj-143", "play": "obj-137", "loop": "obj-136", "stream": "obj-132", "meter": "obj-135", "ip": "obj-129", "port": "obj-128", "connected": "obj-126", "latency": "obj-125", "latency_set": "obj-148"},
+                  "receive": {"ip": "obj-57", "port": "obj-37", "connected": "obj-33", "meter_l": "obj-54", "meter_r": "obj-36", "output": "obj-330", "gain": "obj-344"},
+              },
+              {
+                  "name": "Pamela", "x": 605,
+                  "send": {"open": "obj-230", "play": "obj-227", "loop": "obj-225", "stream": "obj-218", "meter": "obj-223", "ip": "obj-215", "port": "obj-214", "connected": "obj-212", "latency": "obj-211", "latency_set": "obj-252"},
+                  "receive": {"ip": "obj-305", "port": "obj-304", "connected": "obj-299", "meter_l": "obj-302", "meter_r": "obj-301", "output": "obj-338", "gain": "obj-347"},
+              },
+              {
+                  "name": "Dennis", "x": 890,
+                  "send": {"open": "obj-287", "play": "obj-284", "loop": "obj-283", "stream": "obj-273", "meter": "obj-282", "ip": "obj-263", "port": "obj-254", "connected": "obj-193", "latency": "obj-158", "latency_set": "obj-308"},
+                  "receive": {"ip": "obj-370", "port": "obj-369", "connected": "obj-364", "meter_l": "obj-367", "meter_r": "obj-366", "output": "obj-352", "gain": "obj-349"},
+              },
+          ]
+
+          ui = []
+          for index, participant in enumerate(participants):
+              x = participant["x"]
+              ui.append(panel(f"agent-ui-panel-{index}", [x, 118, 255, 548]))
+              ui.append(comment(f"agent-ui-name-{index}", participant["name"], [x + 18, 132, 215, 28], 18, True))
+              ui.append(comment(f"agent-ui-send-title-{index}", "SEND", [x + 18, 169, 90, 20], 11, True, [0.35, 0.35, 0.35, 1.0]))
+              ui.append(comment(f"agent-ui-open-{index}", "file", [x + 18, 197, 38, 18], 10))
+              ui.append(comment(f"agent-ui-play-{index}", "play", [x + 73, 197, 38, 18], 10))
+              ui.append(comment(f"agent-ui-loop-{index}", "loop", [x + 116, 197, 38, 18], 10))
+              ui.append(comment(f"agent-ui-stream-{index}", "stream", [x + 160, 197, 52, 18], 10))
+              ui.append(comment(f"agent-ui-destination-{index}", "destination", [x + 74, 246, 90, 18], 10, False, [0.35, 0.35, 0.35, 1.0]))
+              ui.append(comment(f"agent-ui-send-status-{index}", "connected", [x + 74, 324, 78, 18], 10))
+              ui.append(comment(f"agent-ui-latency-set-{index}", "buffer", [x + 74, 363, 50, 18], 10))
+              ui.append(comment(f"agent-ui-latency-{index}", "latency", [x + 145, 363, 50, 18], 10))
+              ui.append(comment(f"agent-ui-receive-title-{index}", "RECEIVE", [x + 18, 411, 90, 20], 11, True, [0.35, 0.35, 0.35, 1.0]))
+              ui.append(comment(f"agent-ui-local-{index}", "local endpoint", [x + 18, 438, 100, 18], 10, False, [0.35, 0.35, 0.35, 1.0]))
+              ui.append(comment(f"agent-ui-recv-status-{index}", "connected", [x + 18, 512, 76, 18], 10))
+              ui.append(comment(f"agent-ui-output-{index}", "output", [x + 112, 512, 60, 18], 10))
+              ui.append(comment(f"agent-ui-level-{index}", "L      R", [x + 18, 616, 62, 18], 10))
+
+              send = participant["send"]
+              show(send["open"], [x + 18, 216, 42, 22])
+              show(send["play"], [x + 80, 218, 20, 20])
+              show(send["loop"], [x + 123, 218, 20, 20])
+              show(send["stream"], [x + 174, 218, 20, 20])
+              show(send["meter"], [x + 18, 249, 32, 128])
+              show(send["ip"], [x + 74, 265, 145, 22])
+              show(send["port"], [x + 74, 292, 92, 22])
+              show(send["connected"], [x + 88, 343, 20, 20])
+              show(send["latency_set"], [x + 74, 381, 60, 22])
+              show(send["latency"], [x + 145, 381, 60, 22])
+
+              receive = participant["receive"]
+              show(receive["ip"], [x + 18, 458, 145, 22])
+              show(receive["port"], [x + 168, 458, 70, 22])
+              show(receive["connected"], [x + 34, 532, 20, 20])
+              show(receive["output"], [x + 112, 532, 90, 22])
+              show(receive["gain"], [x + 88, 573, 145, 27])
+              show(receive["meter_l"], [x + 18, 632, 25, 25])
+              show(receive["meter_r"], [x + 48, 632, 25, 25])
+
+          title = by_id["obj-118"]
+          title["text"] = "netzwerk patch"
+          title["fontname"] = "Arial"
+          title["fontsize"] = 24.0
+          title["fontface"] = 1
+          title["textcolor"] = [0.1, 0.1, 0.1, 1.0]
+          show("obj-118", [35, 25, 420, 36])
+
+          by_id["obj-199"]["text"] = "Local IP: 192.168.1.122"
+          by_id["obj-199"]["fontsize"] = 12.0
+          by_id["obj-206"]["text"] = "Subnet mask: 255.255.255.0"
+          by_id["obj-206"]["fontsize"] = 12.0
+          show("obj-199", [795, 28, 180, 20])
+          show("obj-206", [980, 28, 190, 20])
+          show("obj-446", [1137, 67, 24, 24])
+
+          ui.extend([
+              comment("agent-ui-subtitle", "four-node local Ethernet audio exchange for laptop ensemble performance", [35, 62, 720, 22], 13, False, [0.35, 0.35, 0.35, 1.0]),
+              comment("agent-ui-init", "initialize", [1058, 70, 72, 20], 11, True, [0.25, 0.25, 0.25, 1.0]),
+              comment("agent-ui-help", "Set the destination and local endpoint for each machine, then initialize and enable the required streams. Test the complete network before a performance. Latency depends on the adapters, computers and audio settings.", [35, 691, 1120, 44], 11, False, [0.3, 0.3, 0.3, 1.0]),
+          ])
+
+          patcher["boxes"] = ui + boxes
+
+          if json.dumps(patcher.get("lines", []), sort_keys=True) != original_lines:
+              raise SystemExit("Patch connections changed unexpectedly")
+
+          patch_path.write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+          PY
+
+      - name: Make README friendlier
+        shell: bash
+        run: |
+          cat > README.md <<'EOF'
+          # netzwerk-patch_maxmsp
+
+          A small and practical Max/MSP network module for laptop-ensemble performances.
+
+          The patch was developed around 2023–2024 by Dmitrii Shchukin, Lukas Döhler and Sascha Etezazi for the NetSound Collective LaptopEnsemble. It grew out of a very simple need: several performers are on the same stage, each with a laptop, and everyone needs a direct local connection that does not depend on the internet behaving itself.
+
+          The current version is prepared for four computers, but the same structure can be extended to more participants. The laptops connect through Ethernet adapters on the same local network and can exchange audio as well as Max/Jitter message data. The included routing is mainly focused on sending and receiving audio streams between the configured performers.
+
+          ## Getting started
+
+          1. Connect all computers to the same Ethernet network.
+          2. Give every computer its own local IP address.
+          3. Update the IP addresses and ports inside the patch for your setup.
+          4. Open the patch on each computer and enable the send, receive and DAC routes you need.
+          5. Test the complete network before the performance, preferably before an audience has arrived to witness the troubleshooting ritual.
+
+          The addresses included in the patch come from the original ensemble setup and will usually need to be changed.
+
+          ## About latency
+
+          Some latency is normal. The exact result depends on the computers, Ethernet adapters, audio settings and local network. The module is useful for live exchange and coordination, but it should not be treated as a sample-accurate transport system.
+
+          ## Companion chat patch
+
+          A related Max/MSP patch adds a simple chat-style dialog window using the same local-network approach. It can be found in a separate repository on the same GitHub profile.
+
+          ## Credits and use
+
+          Initial idea: Dmitrii Shchukin.
+
+          Developed together with Lukas Döhler, Sascha Etezazi and the NetSound Collective LaptopEnsemble.
+
+          The patch is shared freely for artistic and educational use. Feel free to use it, adapt it and perform with it. Attribution is appreciated, and comments, fixes and practical improvements are very welcome.
+          EOF
+
+      - name: Remove temporary workflow
+        shell: bash
+        run: rm -f .github/workflows/rebuild-presentation-ui.yml
+
+      - name: Commit and push
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "Netzwerk Patch.maxpat" README.md .github/workflows/rebuild-presentation-ui.yml
+          git commit -m "Rebuild presentation view and refine README"
+          git push origin HEAD:agent-assisted
