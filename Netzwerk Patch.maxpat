@@ -32,9 +32,9 @@
 		"enablehscroll" : 1,
 		"enablevscroll" : 1,
 		"devicewidth" : 0.0,
-		"description" : "",
-		"digest" : "",
-		"tags" : "",
+		"description" : "Local Ethernet audio and message exchange module for networked laptop performance.",
+		"digest" : "Four-node Max/MSP network module for NetSound Collective LaptopEnsemble.",
+		"tags" : "maxmsp network ethernet audio messages laptop ensemble",
 		"style" : "",
 		"subpatcher_template" : "",
 		"assistshowspatchername" : 0,
@@ -118,7 +118,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 846.153926849365234, 1070.769332885742188, 100.000000953674316, 20.0 ],
-					"text" : "Dennis to Dac"
+					"text" : "Dennis to DAC"
 				}
 
 			}
@@ -645,7 +645,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 27.692310333251953, 1190.769344329833984, 115.595882847308985, 20.0 ],
-					"text" : "Send to Dennis"
+					"text" : "Send audio to Dennis"
 				}
 
 			}
@@ -657,7 +657,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 769.230842590332031, 107.692317962646484, 251.851464865928847, 27.0 ],
-					"text" : "Teilnetzmaske: 255.255.255.0"
+					"text" : "Subnet mask: 255.255.255.0"
 				}
 
 			}
@@ -669,7 +669,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 769.230842590332031, 78.461545944213867, 251.851464865928847, 27.0 ],
-					"text" : "IP Adresse: 192.168.1.122"
+					"text" : "Local IP: 192.168.1.122"
 				}
 
 			}
@@ -731,7 +731,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 856.923158645629883, 789.230844497680664, 100.000000953674316, 20.0 ],
-					"text" : "Pamela to Dac"
+					"text" : "Pamela to DAC"
 				}
 
 			}
@@ -767,7 +767,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 856.923158645629883, 255.384639739990234, 100.000000953674316, 20.0 ],
-					"text" : "Sascha to Dac"
+					"text" : "Sascha to DAC"
 				}
 
 			}
@@ -803,7 +803,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 856.923158645629883, 520.000049591064453, 100.000000953674316, 20.0 ],
-					"text" : "Dmitrii to Dac"
+					"text" : "Dmitrii to DAC"
 				}
 
 			}
@@ -1364,7 +1364,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 27.692310333251953, 738.46160888671875, 115.595882847308985, 20.0 ],
-					"text" : "Send to Pamela"
+					"text" : "Send audio to Pamela"
 				}
 
 			}
@@ -1375,7 +1375,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 40.000003814697266, 86.153854370117188, 115.595882847308985, 20.0 ],
-					"text" : "Send to Sascha"
+					"text" : "Send audio to Sascha"
 				}
 
 			}
@@ -1386,7 +1386,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 0,
 					"patching_rect" : [ 27.692310333251953, 403.076961517333984, 115.595882847308985, 20.0 ],
-					"text" : "Send to Dmitrii"
+					"text" : "Send audio to Dmitrii"
 				}
 
 			}
@@ -1700,14 +1700,14 @@
 			}
 , 			{
 				"box" : 				{
-					"fontname" : "Georgia",
+					"fontname" : "Arial",
 					"fontsize" : 20.0,
 					"id" : "obj-118",
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 186.153863906860352, 52.307697296142578, 180.45713147769402, 29.0 ],
-					"text" : "Network Module",
+					"patching_rect" : [ 186.153863906860352, 52.307697296142578, 300.0, 29.0 ],
+					"text" : "Netzwerk Patch - Network Module",
 					"textcolor" : [ 1.0, 1.0, 1.0, 1.0 ]
 				}
 
@@ -1940,8 +1940,8 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 356.923110961914062, 63.076929092407227, 490.0, 20.0 ],
-					"text" : "https://cycling74.com/forums/streaming-audio-from-one-machine-to-another-over-network"
+					"patching_rect" : [ 500.0, 63.076929092407227, 360.0, 20.0 ],
+					"text" : "Local Ethernet audio/data exchange - network latency may vary"
 				}
 
 			}
