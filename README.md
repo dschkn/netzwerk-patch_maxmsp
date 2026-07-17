@@ -2,7 +2,7 @@
 
 A small Max/MSP network module for laptop-ensemble performances.
 
-The patch was developed by Dmitrii Shchukin for the NetSound Collective LaptopEnsemble around 2023–2024. It was created for situations in which several performers share a stage and need a direct local connection between their computers.
+The patch was developed by Dmitrii Shchukin, Lukas Döhler and Sascha Etetzazi for the NetSound Collective LaptopEnsemble around 2023–2024. It was created for situations in which several performers share a stage and need a direct local connection between their computers.
 
 The current patch is configured for four laptops, but the same structure can be extended to additional machines. The computers connect through Ethernet adapters on the same local network and exchange audio and message data without relying on an internet connection. The included routing focuses mainly on sending and receiving audio streams between the configured participants.
 
@@ -26,8 +26,8 @@ A related Max/MSP patch adds a simple chat-style dialog window using the same lo
 
 ## Credits and use
 
-Initial development: Dmitrii Shchukin.
+Initial idea: Dmitrii Shchukin
 
-Developed in collaboration with Lukas Döhler and the NetSound Collective LaptopEnsemble.
+Developed in collaboration with Lukas Döhler, Sascha Etezazi and the NetSound Collective LaptopEnsemble.
 
 This patch is shared freely for artistic and educational use. You may use, adapt, and perform with it. Attribution is appreciated, and comments, fixes, and practical improvements are welcome.
